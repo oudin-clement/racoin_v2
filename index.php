@@ -55,9 +55,10 @@ $chemin = dirname($_SERVER['SCRIPT_NAME']);
 $cat = new getCategorie();
 $dpt = new getDepartment();
 
-$app->get('/', function () use ($twig, $menu, $chemin, $cat) {
+$app->get('/', function ($request, $response) use ($twig, $menu, $chemin, $cat) {
     $index = new index();
     $index->displayAllAnnonce($twig, $menu, $chemin, $cat->getCategories());
+    return $response;
 });
 
 $app->get('/item/{n}', function ( $request,  $response, $arg) use ($twig, $menu, $chemin, $cat) {
@@ -67,15 +68,17 @@ $app->get('/item/{n}', function ( $request,  $response, $arg) use ($twig, $menu,
     return $response;
 });
 
-$app->get('/add', function () use ($twig, $app, $menu, $chemin, $cat, $dpt) {
+$app->get('/add', function ($request, $response) use ($twig, $app, $menu, $chemin, $cat, $dpt) {
     $ajout = new \App\controller\addItem();
     $ajout->addItemView($twig, $menu, $chemin, $cat->getCategories(), $dpt->getAllDepartments());
+    return $response;
 });
 
-$app->post('/add', function ( $request) use ($twig, $app, $menu, $chemin) {
+$app->post('/add', function ( $request, $response) use ($twig, $app, $menu, $chemin) {
     $allPostVars = $request->getParsedBody();
     $ajout       = new \App\controller\addItem();
     $ajout->addNewItem($twig, $menu, $chemin, $allPostVars);
+    return $response;
 });
 
 $app->get('/item/{id}/edit', function ( $request,  $response, $arg) use ($twig, $menu, $chemin) {
@@ -99,9 +102,10 @@ $app->map(['GET, POST'], '/item/{id}/confirm', function ( $request,  $response, 
     return $response;
 });
 
-$app->get('/search', function () use ($twig, $menu, $chemin, $cat) {
+$app->get('/search', function ($resquest, $response) use ($twig, $menu, $chemin, $cat) {
     $s = new \App\controller\Search();
     $s->show($twig, $menu, $chemin, $cat->getCategories());
+    return $response;
 });
 
 
@@ -139,7 +143,7 @@ $app->get('/cat/{n}', function ( $request,  $response, $arg) use ($twig, $menu, 
     return $response;
 });
 
-$app->get('/api(/)', function () use ($twig, $menu, $chemin, $cat) {
+$app->get('/api(/)', function ($request, $response) use ($twig, $menu, $chemin, $cat) {
     $template = $twig->load('api.html.twig');
     $menu     = array(
         array(
@@ -152,6 +156,7 @@ $app->get('/api(/)', function () use ($twig, $menu, $chemin, $cat) {
         )
     );
     echo $template->render(array('breadcrumb' => $menu, 'chemin' => $chemin));
+    return $response;
 });
 
 $app->group('/api', function () use ($app, $twig, $menu, $chemin, $cat) {
@@ -235,16 +240,18 @@ $app->group('/api', function () use ($app, $twig, $menu, $chemin, $cat) {
             return $response;
         });
 
-    $app->get('/key', function () use ($app, $twig, $menu, $chemin, $cat) {
+    $app->get('/key', function ($request, $response ) use ($app, $twig, $menu, $chemin, $cat) {
         $kg = new \App\controller\KeyGenerator();
         $kg->show($twig, $menu, $chemin, $cat->getCategories());
+        return $response;
     });
 
-    $app->post('/key', function () use ($app, $twig, $menu, $chemin, $cat) {
+    $app->post('/key', function ($resuest, $response) use ($app, $twig, $menu, $chemin, $cat) {
         $nom = $_POST['nom'];
 
         $kg = new \App\controller\KeyGenerator();
         $kg->generateKey($twig, $menu, $chemin, $cat->getCategories(), $nom);
+        return $response;
     });
 });
 
