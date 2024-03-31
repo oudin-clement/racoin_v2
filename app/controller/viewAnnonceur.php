@@ -6,15 +6,15 @@
  * Time: 00:25
  */
 
-namespace controller;
-use model\Annonce;
-use model\Annonceur;
-use model\Photo;
+namespace App\controller;
+use App\model\Annonce;
+use App\model\Annonceur;
+use App\model\Photo;
 
 class viewAnnonceur {
     public function __construct(){
     }
-    function afficherAnnonceur($twig, $menu, $chemin, $n, $cat) {
+    function afficherAnnonceur($twig, $chemin, $n, $cat) {
         $this->annonceur = annonceur::find($n);
         if(!isset($this->annonceur)){
             echo "404";

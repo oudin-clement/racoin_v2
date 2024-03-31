@@ -1,17 +1,18 @@
 <?php
 require 'vendor/autoload.php';
 
-use controller\getCategorie;
-use controller\getDepartment;
-use controller\index;
-use controller\item;
-use db\connection;
+use App\controller\getCategorie;
+use App\controller\getDepartment;
+use App\controller\index;
+use App\controller\item;
+use App\db\connection;
 
-use model\Annonce;
-use model\Categorie;
-use model\Annonceur;
-use model\Departement;
+use App\model\Annonce;
+use App\model\Categorie;
+use App\model\Annonceur;
+use App\model\Departement;
 use Slim\App;
+use Slim\Factory\AppFactory;
 use Slim\Http\Request;
 use Slim\Http\Response;
 use Twig\Environment;
@@ -21,30 +22,15 @@ use Twig\Loader\FilesystemLoader;
 connection::createConn();
 
 // Initialisation de Slim
-$app = new App([
-    'settings' => [
-        'displayErrorDetails' => true,
-    ],
-]);
+$app = AppFactory::create();
+$app->addErrorMiddleware(true, false, false);
 
 // Initialisation de Twig
 $loader = new FilesystemLoader(__DIR__ . '/template');
 $twig   = new Environment($loader);
 
 // Ajout d'un middleware pour le trailing slash
-$app->add(function (Request $request, Response $response, $next) {
-    $uri  = $request->getUri();
-    $path = $uri->getPath();
-    if ($path != '/' && str_ends_with($path, '/')) {
-        $uri = $uri->withPath(substr($path, 0, -1));
-        if ($request->getMethod() == 'GET') {
-            return $response->withRedirect((string)$uri, 301);
-        } else {
-            return $next($request->withUri($uri), $response);
-        }
-    }
-    return $next($request, $response);
-});
+$app->addRoutingMiddleware();
 
 
 if (!isset($_SESSION)) {
@@ -84,13 +70,13 @@ $app->get('/item/{n}', function ($request, $response, $arg) use ($twig, $menu, $
 });
 
 $app->get('/add', function () use ($twig, $app, $menu, $chemin, $cat, $dpt) {
-    $ajout = new controller\addItem();
+    $ajout = new App\controller\addItem();
     $ajout->addItemView($twig, $menu, $chemin, $cat->getCategories(), $dpt->getAllDepartments());
 });
 
 $app->post('/add', function ($request) use ($twig, $app, $menu, $chemin) {
     $allPostVars = $request->getParsedBody();
-    $ajout       = new controller\addItem();
+    $ajout       = new App\controller\addItem();
     $ajout->addNewItem($twig, $menu, $chemin, $allPostVars);
 });
 
@@ -101,9 +87,8 @@ $app->get('/item/{id}/edit', function ($request, $response, $arg) use ($twig, $m
 });
 $app->post('/item/{id}/edit', function ($request, $response, $arg) use ($twig, $app, $menu, $chemin, $cat, $dpt) {
     $id          = $arg['id'];
-    $allPostVars = $request->getParsedBody();
     $item        = new item();
-    $item->modifyPost($twig, $menu, $chemin, $id, $allPostVars, $cat->getCategories(), $dpt->getAllDepartments());
+    $item->modifyPost($twig, $menu, $chemin, $id, $cat->getCategories(), $dpt->getAllDepartments());
 });
 
 $app->map(['GET, POST'], '/item/{id}/confirm', function ($request, $response, $arg) use ($twig, $app, $menu, $chemin) {
@@ -114,39 +99,39 @@ $app->map(['GET, POST'], '/item/{id}/confirm', function ($request, $response, $a
 });
 
 $app->get('/search', function () use ($twig, $menu, $chemin, $cat) {
-    $s = new controller\Search();
+    $s = new App\controller\Search();
     $s->show($twig, $menu, $chemin, $cat->getCategories());
 });
 
 
 $app->post('/search', function ($request, $response) use ($app, $twig, $menu, $chemin, $cat) {
     $array = $request->getParsedBody();
-    $s     = new controller\Search();
+    $s     = new App\controller\Search();
     $s->research($array, $twig, $menu, $chemin, $cat->getCategories());
 
 });
 
 $app->get('/annonceur/{n}', function ($request, $response, $arg) use ($twig, $menu, $chemin, $cat) {
     $n         = $arg['n'];
-    $annonceur = new controller\viewAnnonceur();
+    $annonceur = new App\controller\viewAnnonceur();
     $annonceur->afficherAnnonceur($twig, $menu, $chemin, $n, $cat->getCategories());
 });
 
 $app->get('/del/{n}', function ($request, $response, $arg) use ($twig, $menu, $chemin) {
     $n    = $arg['n'];
-    $item = new controller\item();
+    $item = new App\controller\item();
     $item->supprimerItemGet($twig, $menu, $chemin, $n);
 });
 
 $app->post('/del/{n}', function ($request, $response, $arg) use ($twig, $menu, $chemin, $cat) {
     $n    = $arg['n'];
-    $item = new controller\item();
+    $item = new App\controller\item();
     $item->supprimerItemPost($twig, $menu, $chemin, $n, $cat->getCategories());
 });
 
 $app->get('/cat/{n}', function ($request, $response, $arg) use ($twig, $menu, $chemin, $cat) {
     $n = $arg['n'];
-    $categorie = new controller\getCategorie();
+    $categorie = new App\controller\getCategorie();
     $categorie->displayCategorie($twig, $menu, $chemin, $cat->getCategories(), $n);
 });
 
@@ -247,14 +232,14 @@ $app->group('/api', function () use ($app, $twig, $menu, $chemin, $cat) {
     });
 
     $app->get('/key', function () use ($app, $twig, $menu, $chemin, $cat) {
-        $kg = new controller\KeyGenerator();
+        $kg = new App\controller\KeyGenerator();
         $kg->show($twig, $menu, $chemin, $cat->getCategories());
     });
 
     $app->post('/key', function () use ($app, $twig, $menu, $chemin, $cat) {
         $nom = $_POST['nom'];
 
-        $kg = new controller\KeyGenerator();
+        $kg = new App\controller\KeyGenerator();
         $kg->generateKey($twig, $menu, $chemin, $cat->getCategories(), $nom);
     });
 });

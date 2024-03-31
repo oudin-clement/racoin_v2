@@ -1,11 +1,11 @@
 <?php
 
-namespace controller;
+namespace App\controller;
 
-use model\Categorie;
-use model\Annonce;
-use model\Photo;
-use model\Annonceur;
+use App\model\Categorie;
+use App\model\Annonce;
+use App\model\Photo;
+use App\model\Annonceur;
 
 class getCategorie {
 
@@ -15,8 +15,8 @@ class getCategorie {
         return Categorie::orderBy('nom_categorie')->get()->toArray();
     }
 
-    public function getCategorieContent($chemin, $n) {
-        $tmp = Annonce::with("Annonceur")->orderBy('id_annonce','desc')->where('id_categorie', "=", $n)->get();
+    public function getCategorieContent(string $chemin, $id_categ) {
+        $tmp = Annonce::with("Annonceur")->orderBy('id_annonce','desc')->where('id_categorie', "=", $id_categ)->get();
         $annonce = [];
         foreach($tmp as $t) {
             $t->nb_photo = Photo::where("id_annonce", "=", $t->id_annonce)->count();
@@ -35,16 +35,16 @@ class getCategorie {
         $this->annonce = $annonce;
     }
 
-    public function displayCategorie($twig, $menu, $chemin, $cat, $n) {
+    public function displayCategorie($twig, $chemin, $cat, $nom_categ) {
         $template = $twig->load("index.html.twig");
         $menu = array(
             array('href' => $chemin,
                 'text' => 'Acceuil'),
-            array('href' => $chemin."/cat/".$n,
-                'text' => Categorie::find($n)->nom_categorie)
+            array('href' => $chemin."/cat/".$nom_categ,
+                'text' => Categorie::find($nom_categ)->nom_categorie)
         );
 
-        $this->getCategorieContent($chemin, $n);
+        $this->getCategorieContent($chemin, $nom_categ);
         echo $template->render(array(
             "breadcrumb" => $menu,
             "chemin" => $chemin,

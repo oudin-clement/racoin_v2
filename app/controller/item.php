@@ -1,12 +1,12 @@
 <?php
 
-namespace controller;
+namespace App\controller;
 use AllowDynamicProperties;
-use model\Annonce;
-use model\Annonceur;
-use model\Departement;
-use model\Photo;
-use model\Categorie;
+use App\model\Annonce;
+use App\model\Annonceur;
+use App\model\Departement;
+use App\model\Photo;
+use App\model\Categorie;
 
 #[AllowDynamicProperties] class item {
     public function __construct(){
@@ -85,8 +85,8 @@ use model\Categorie;
             "annonce" => $this->annonce));
     }
 
-    function modifyPost($twig, $menu, $chemin, $n, $cat, $dpt){
-        $this->annonce = Annonce::find($n);
+    function modifyPost($twig, $menu, $chemin, $annonce, $cat, $dpt){
+        $this->annonce = Annonce::find($annonce);
         $this->annonceur = Annonceur::find($this->annonce->id_annonceur);
         $this->categItem = Categorie::find($this->annonce->id_categorie)->nom_categorie;
         $this->dptItem = Departement::find($this->annonce->id_departement)->nom_departement;
