@@ -64,6 +64,7 @@ $app->get('/item/{n}', function ( $request,  $response, $arg) use ($twig, $menu,
     $n     = $arg['n'];
     $item = new item();
     $item->afficherItem($twig, $menu, $chemin, $n, $cat->getCategories());
+    return $response;
 });
 
 $app->get('/add', function () use ($twig, $app, $menu, $chemin, $cat, $dpt) {
@@ -81,11 +82,13 @@ $app->get('/item/{id}/edit', function ( $request,  $response, $arg) use ($twig, 
     $id   = $arg['id'];
     $item = new item();
     $item->modifyGet($twig, $menu, $chemin, $id);
+    return $response;
 });
 $app->post('/item/{id}/edit', function ( $request,  $response, $arg) use ($twig, $app, $menu, $chemin, $cat, $dpt) {
     $id          = $arg['id'];
     $item        = new item();
     $item->modifyPost($twig, $menu, $chemin, $id, $cat->getCategories(), $dpt->getAllDepartments());
+    return $response;
 });
 
 $app->map(['GET, POST'], '/item/{id}/confirm', function ( $request,  $response, $arg) use ($twig, $app, $menu, $chemin) {
@@ -93,6 +96,7 @@ $app->map(['GET, POST'], '/item/{id}/confirm', function ( $request,  $response, 
     $allPostVars = $request->getParsedBody();
     $item        = new item();
     $item->edit($twig, $menu, $chemin, $id, $allPostVars);
+    return $response;
 });
 
 $app->get('/search', function () use ($twig, $menu, $chemin, $cat) {
@@ -105,7 +109,7 @@ $app->post('/search', function ( $request,  $response) use ($app, $twig, $menu, 
     $array = $request->getParsedBody();
     $s     = new \App\controller\Search();
     $s->research($array, $twig, $menu, $chemin, $cat->getCategories());
-
+    return $response;
 });
 
 $app->get('/annonceur/{n}', function ( $request,  $response, $arg) use ($twig, $menu, $chemin, $cat) {
@@ -118,18 +122,21 @@ $app->get('/del/{n}', function ( $request,  $response, $arg) use ($twig, $menu, 
     $n    = $arg['n'];
     $item = new \App\controller\item();
     $item->supprimerItemGet($twig, $menu, $chemin, $n);
+    return $response;
 });
 
 $app->post('/del/{n}', function ( $request,  $response, $arg) use ($twig, $menu, $chemin, $cat) {
     $n    = $arg['n'];
     $item = new \App\controller\item();
     $item->supprimerItemPost($twig, $menu, $chemin, $n, $cat->getCategories());
+    return $response;
 });
 
 $app->get('/cat/{n}', function ( $request,  $response, $arg) use ($twig, $menu, $chemin, $cat) {
     $n = $arg['n'];
     $categorie = new \App\controller\getCategorie();
     $categorie->displayCategorie($twig, $menu, $chemin, $cat->getCategories(), $n);
+    return $response;
 });
 
 $app->get('/api(/)', function () use ($twig, $menu, $chemin, $cat) {
@@ -169,6 +176,7 @@ $app->group('/api', function () use ($app, $twig, $menu, $chemin, $cat) {
             } else {
                 $app->notFound();
             }
+            return $response;
         });
 
 
@@ -185,6 +193,7 @@ $app->group('/api', function () use ($app, $twig, $menu, $chemin, $cat) {
             $links['self']['href'] = '/api/annonces/';
             $a->links              = $links;
             echo $a->toJson();
+            return $response;
         });
 
 
@@ -209,6 +218,7 @@ $app->group('/api', function () use ($app, $twig, $menu, $chemin, $cat) {
             $c->links              = $links;
             $c->annonces           = $a;
             echo $c->toJson();
+            return $response;
         });
 
         $app->get('/categories', function ( $request,  $response, $arg) use ($app) {
@@ -222,6 +232,7 @@ $app->group('/api', function () use ($app, $twig, $menu, $chemin, $cat) {
             $links['self']['href'] = '/api/categories/';
             $c->links              = $links;
             echo $c->toJson();
+            return $response;
         });
 
     $app->get('/key', function () use ($app, $twig, $menu, $chemin, $cat) {
