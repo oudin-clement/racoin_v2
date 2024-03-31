@@ -152,9 +152,9 @@ $app->get('/api(/)', function () use ($twig, $menu, $chemin, $cat) {
 
 $app->group('/api', function () use ($app, $twig, $menu, $chemin, $cat) {
 
-    $app->group('/annonce', function () use ($app) {
 
-        $app->get('/{id}', function ($request, $response, $arg) use ($app) {
+
+        $app->get('/annonce/{id}', function ($request, $response, $arg) use ($app) {
             $id          = $arg['id'];
             $annonceList = ['id_annonce', 'id_categorie as categorie', 'id_annonceur as annonceur', 'id_departement as departement', 'prix', 'date', 'titre', 'description', 'ville'];
             $return      = Annonce::select($annonceList)->find($id);
@@ -173,11 +173,10 @@ $app->group('/api', function () use ($app, $twig, $menu, $chemin, $cat) {
                 $app->notFound();
             }
         });
-    });
 
-    $app->group('/annonces(/)', function () use ($app) {
 
-        $app->get('/', function ($request, $response) use ($app) {
+
+        $app->get('/annonces', function ($request, $response) use ($app) {
             $annonceList = ['id_annonce', 'prix', 'titre', 'ville'];
             $response->headers->set('Content-Type', 'application/json');
             $a     = Annonce::all($annonceList);
@@ -190,12 +189,12 @@ $app->group('/api', function () use ($app, $twig, $menu, $chemin, $cat) {
             $a->links              = $links;
             echo $a->toJson();
         });
-    });
 
 
-    $app->group('/categorie', function () use ($app) {
 
-        $app->get('/{id}', function ($request, $response, $arg) use ($app) {
+
+
+        $app->get('/categorie/{id}', function ($request, $response, $arg) use ($app) {
             $id = $arg['id'];
             $response->headers->set('Content-Type', 'application/json');
             $a     = Annonce::select('id_annonce', 'prix', 'titre', 'ville')
@@ -214,10 +213,8 @@ $app->group('/api', function () use ($app, $twig, $menu, $chemin, $cat) {
             $c->annonces           = $a;
             echo $c->toJson();
         });
-    });
 
-    $app->group('/categories(/)', function () use ($app) {
-        $app->get('/', function ($request, $response, $arg) use ($app) {
+        $app->get('/categories', function ($request, $response, $arg) use ($app) {
             $response->headers->set('Content-Type', 'application/json');
             $c     = Categorie::get();
             $links = [];
@@ -229,7 +226,6 @@ $app->group('/api', function () use ($app, $twig, $menu, $chemin, $cat) {
             $c->links              = $links;
             echo $c->toJson();
         });
-    });
 
     $app->get('/key', function () use ($app, $twig, $menu, $chemin, $cat) {
         $kg = new App\controller\KeyGenerator();
