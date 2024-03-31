@@ -11,10 +11,7 @@ use App\model\Annonce;
 use App\model\Categorie;
 use App\model\Annonceur;
 use App\model\Departement;
-use Slim\App;
 use Slim\Factory\AppFactory;
-use Slim\Http\Request;
-use Slim\Http\Response;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
@@ -63,35 +60,35 @@ $app->get('/', function () use ($twig, $menu, $chemin, $cat) {
     $index->displayAllAnnonce($twig, $menu, $chemin, $cat->getCategories());
 });
 
-$app->get('/item/{n}', function ($request, $response, $arg) use ($twig, $menu, $chemin, $cat) {
+$app->get('/item/{n}', function ( $request,  $response, $arg) use ($twig, $menu, $chemin, $cat) {
     $n     = $arg['n'];
     $item = new item();
     $item->afficherItem($twig, $menu, $chemin, $n, $cat->getCategories());
 });
 
 $app->get('/add', function () use ($twig, $app, $menu, $chemin, $cat, $dpt) {
-    $ajout = new App\controller\addItem();
+    $ajout = new \App\controller\addItem();
     $ajout->addItemView($twig, $menu, $chemin, $cat->getCategories(), $dpt->getAllDepartments());
 });
 
-$app->post('/add', function ($request) use ($twig, $app, $menu, $chemin) {
+$app->post('/add', function ( $request) use ($twig, $app, $menu, $chemin) {
     $allPostVars = $request->getParsedBody();
-    $ajout       = new App\controller\addItem();
+    $ajout       = new \App\controller\addItem();
     $ajout->addNewItem($twig, $menu, $chemin, $allPostVars);
 });
 
-$app->get('/item/{id}/edit', function ($request, $response, $arg) use ($twig, $menu, $chemin) {
+$app->get('/item/{id}/edit', function ( $request,  $response, $arg) use ($twig, $menu, $chemin) {
     $id   = $arg['id'];
     $item = new item();
     $item->modifyGet($twig, $menu, $chemin, $id);
 });
-$app->post('/item/{id}/edit', function ($request, $response, $arg) use ($twig, $app, $menu, $chemin, $cat, $dpt) {
+$app->post('/item/{id}/edit', function ( $request,  $response, $arg) use ($twig, $app, $menu, $chemin, $cat, $dpt) {
     $id          = $arg['id'];
     $item        = new item();
     $item->modifyPost($twig, $menu, $chemin, $id, $cat->getCategories(), $dpt->getAllDepartments());
 });
 
-$app->map(['GET, POST'], '/item/{id}/confirm', function ($request, $response, $arg) use ($twig, $app, $menu, $chemin) {
+$app->map(['GET, POST'], '/item/{id}/confirm', function ( $request,  $response, $arg) use ($twig, $app, $menu, $chemin) {
     $id   = $arg['id'];
     $allPostVars = $request->getParsedBody();
     $item        = new item();
@@ -99,39 +96,39 @@ $app->map(['GET, POST'], '/item/{id}/confirm', function ($request, $response, $a
 });
 
 $app->get('/search', function () use ($twig, $menu, $chemin, $cat) {
-    $s = new App\controller\Search();
+    $s = new \App\controller\Search();
     $s->show($twig, $menu, $chemin, $cat->getCategories());
 });
 
 
-$app->post('/search', function ($request, $response) use ($app, $twig, $menu, $chemin, $cat) {
+$app->post('/search', function ( $request,  $response) use ($app, $twig, $menu, $chemin, $cat) {
     $array = $request->getParsedBody();
-    $s     = new App\controller\Search();
+    $s     = new \App\controller\Search();
     $s->research($array, $twig, $menu, $chemin, $cat->getCategories());
 
 });
 
-$app->get('/annonceur/{n}', function ($request, $response, $arg) use ($twig, $menu, $chemin, $cat) {
+$app->get('/annonceur/{n}', function ( $request,  $response, $arg) use ($twig, $menu, $chemin, $cat) {
     $n         = $arg['n'];
-    $annonceur = new App\controller\viewAnnonceur();
+    $annonceur = new \App\controller\viewAnnonceur();
     $annonceur->afficherAnnonceur($twig, $menu, $chemin, $n, $cat->getCategories());
 });
 
-$app->get('/del/{n}', function ($request, $response, $arg) use ($twig, $menu, $chemin) {
+$app->get('/del/{n}', function ( $request,  $response, $arg) use ($twig, $menu, $chemin) {
     $n    = $arg['n'];
-    $item = new App\controller\item();
+    $item = new \App\controller\item();
     $item->supprimerItemGet($twig, $menu, $chemin, $n);
 });
 
-$app->post('/del/{n}', function ($request, $response, $arg) use ($twig, $menu, $chemin, $cat) {
+$app->post('/del/{n}', function ( $request,  $response, $arg) use ($twig, $menu, $chemin, $cat) {
     $n    = $arg['n'];
-    $item = new App\controller\item();
+    $item = new \App\controller\item();
     $item->supprimerItemPost($twig, $menu, $chemin, $n, $cat->getCategories());
 });
 
-$app->get('/cat/{n}', function ($request, $response, $arg) use ($twig, $menu, $chemin, $cat) {
+$app->get('/cat/{n}', function ( $request,  $response, $arg) use ($twig, $menu, $chemin, $cat) {
     $n = $arg['n'];
-    $categorie = new App\controller\getCategorie();
+    $categorie = new \App\controller\getCategorie();
     $categorie->displayCategorie($twig, $menu, $chemin, $cat->getCategories(), $n);
 });
 
@@ -154,7 +151,7 @@ $app->group('/api', function () use ($app, $twig, $menu, $chemin, $cat) {
 
 
 
-        $app->get('/annonce/{id}', function ($request, $response, $arg) use ($app) {
+        $app->get('/annonce/{id}', function ( $request,  $response, $arg) use ($app) {
             $id          = $arg['id'];
             $annonceList = ['id_annonce', 'id_categorie as categorie', 'id_annonceur as annonceur', 'id_departement as departement', 'prix', 'date', 'titre', 'description', 'ville'];
             $return      = Annonce::select($annonceList)->find($id);
@@ -176,7 +173,7 @@ $app->group('/api', function () use ($app, $twig, $menu, $chemin, $cat) {
 
 
 
-        $app->get('/annonces', function ($request, $response) use ($app) {
+        $app->get('/annonces', function ( $request,  $response) use ($app) {
             $annonceList = ['id_annonce', 'prix', 'titre', 'ville'];
             $response->headers->set('Content-Type', 'application/json');
             $a     = Annonce::all($annonceList);
@@ -194,7 +191,7 @@ $app->group('/api', function () use ($app, $twig, $menu, $chemin, $cat) {
 
 
 
-        $app->get('/categorie/{id}', function ($request, $response, $arg) use ($app) {
+        $app->get('/categorie/{id}', function ( $request,  $response, $arg) use ($app) {
             $id = $arg['id'];
             $response->headers->set('Content-Type', 'application/json');
             $a     = Annonce::select('id_annonce', 'prix', 'titre', 'ville')
@@ -214,7 +211,7 @@ $app->group('/api', function () use ($app, $twig, $menu, $chemin, $cat) {
             echo $c->toJson();
         });
 
-        $app->get('/categories', function ($request, $response, $arg) use ($app) {
+        $app->get('/categories', function ( $request,  $response, $arg) use ($app) {
             $response->headers->set('Content-Type', 'application/json');
             $c     = Categorie::get();
             $links = [];
@@ -228,14 +225,14 @@ $app->group('/api', function () use ($app, $twig, $menu, $chemin, $cat) {
         });
 
     $app->get('/key', function () use ($app, $twig, $menu, $chemin, $cat) {
-        $kg = new App\controller\KeyGenerator();
+        $kg = new \App\controller\KeyGenerator();
         $kg->show($twig, $menu, $chemin, $cat->getCategories());
     });
 
     $app->post('/key', function () use ($app, $twig, $menu, $chemin, $cat) {
         $nom = $_POST['nom'];
 
-        $kg = new App\controller\KeyGenerator();
+        $kg = new \App\controller\KeyGenerator();
         $kg->generateKey($twig, $menu, $chemin, $cat->getCategories(), $nom);
     });
 });
