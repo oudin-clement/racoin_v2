@@ -18,7 +18,7 @@ class search {
         echo $template->render(array("breadcrumb" => $menu, "chemin" => $chemin, "categories" => $cat));
     }
 
-    function research($array, $twig, $menu, $chemin, $cat) {
+    function research($array, $twig, $chemin, $cat) {
         $template = $twig->load("index.html.twig");
         $menu = array(
             array('href' => $chemin,
